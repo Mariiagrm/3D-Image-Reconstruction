@@ -1,5 +1,5 @@
 pydicom
 matplotlib
-numpy
+numpy<2
 opencv-python-headless
 plotly

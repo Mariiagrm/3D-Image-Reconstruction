@@ -67,7 +67,7 @@ static void benchmark_strassen(double *t_sec_out, double *t_par_out) {
 int main(void) {
 
     // ── 1. Cargar nube de puntos Nx3 (sin padding) ──────────────────────────
-    print("--- PASO 2: Reconstruccion de imagen 3D mediante multiplicacion de matrices ---")
+    printf("--- PASO 2: Reconstruccion de imagen 3D mediante multiplicacion de matrices ---");
 
     printf("Cargando nube de puntos 3D desde ../data_binaria/puntos_3d.bin...\n");
     int N = 0, cols = 0;

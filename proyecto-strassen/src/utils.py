@@ -56,11 +56,21 @@ def reconstruccion_directorio(ruta_directorio, K):
 
     print("Preprocesando imágenes y calculando descriptores SIFT... (esto puede tardar un poco)")
     print("Alternativa más rapida con kernel de CUDA, si tienes GPU compatible [S/N]: ", end="")
+    
+    keypoints_list, descriptores_list = [], []
+
+    src_dir = Path(__file__).parent  # always src/
+    ruta_procesadas = src_dir / "procesadas"
+
+    # Leer imágenes procesadas (pobladas por cuda_sift o por la ruta CPU)
+    archivos = sorted([f for f in os.listdir(ruta_procesadas)
+                    if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+
+    
     respuesta = input().strip().lower()
     if respuesta == 's':
         print("Ejecutando preprocesamiento optimizado con GPU (CUDA)...")
-        resultado = subprocess.run(
-            ["./cuda_sift", str(ruta_directorio)],
+        resultado = subprocess.run( ["./cuda_sift", str(ruta_directorio)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
@@ -74,39 +84,32 @@ def reconstruccion_directorio(ruta_directorio, K):
     else:
         print("Ejecutando preprocesamiento secuencial en CPU...")
 
-        keypoints_list, descriptores_list = [], []
+    
+    if len(archivos) < 2:
+        raise ValueError("Se necesitan al menos 2 imágenes en el directorio.")
 
-        src_dir = Path(__file__).parent  # always src/
-        ruta_procesadas = src_dir / "procesadas"
-        # Processed images are always written to src/procesadas/ by the C++ binary
-        archivos = sorted([f for f in os.listdir(ruta_procesadas)
-                        if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+    print(f"Encontradas {len(archivos)} imágenes. Calculando descriptores SIFT con 2 hilos...")
 
-        if len(archivos) < 2:
-            raise ValueError("Se necesitan al menos 2 imágenes en el directorio.")
+    def _procesar(archivo):
+        img = cv2.imread(str(ruta_procesadas / archivo), cv2.IMREAD_GRAYSCALE)
+        if img is None:
+            raise ValueError(f"No se pudo cargar: {archivo}")
+        sift_local = cv2.SIFT_create()
+        return sift_local.detectAndCompute(img, None)
 
-        print(f"Encontradas {len(archivos)} imágenes. Calculando descriptores SIFT con 2 hilos...")
+    time_start = time.time()
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        resultados = list(executor.map(_procesar, archivos))
+    time_end = time.time()
+    print(f"Tiempo total de cálculo de descriptores SIFT: {time_end - time_start:.2f} segundos")
 
-        def _procesar(archivo):
-            img = cv2.imread(str(ruta_procesadas / archivo), cv2.IMREAD_GRAYSCALE)
-            if img is None:
-                raise VsalueError(f"No se pudo cargar: {archivo}")
-            sift_local = cv2.SIFT_create()  # instancia propia por hilo
-            return sift_local.detectAndCompute(img, None)
+    csv_path = Path(__file__).parent.parent / "data_binaria" / "tiempos.csv"
+    with open(csv_path, "a") as f:
+        f.write(f"sift_descriptores,{time_end - time_start:.6f},{len(archivos)}\n")
+    print("Descriptores SIFT calculados.")
 
-        time_start = time.time()
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            resultados = list(executor.map(_procesar, archivos))
-        time_end = time.time()
-        print(f"Tiempo total de cálculo de descriptores SIFT: {time_end - time_start:.2f} segundos")
-
-        csv_path = Path(__file__).parent.parent / "data_binaria" / "tiempos.csv"
-        with open(csv_path, "a") as f:
-            f.write(f"sift_descriptores,{time_end - time_start:.6f},{len(archivos)}\n")
-        print("Descriptores SIFT calculados.")
-
-        keypoints_list   = [r[0] for r in resultados]
-        descriptores_list = [r[1] for r in resultados]
+    keypoints_list   = [r[0] for r in resultados]
+    descriptores_list = [r[1] for r in resultados]
 
     #Cámara 0 como origen del sistema de referencia global
     R_global = np.eye(3)

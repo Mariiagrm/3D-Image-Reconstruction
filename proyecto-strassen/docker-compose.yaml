@@ -9,4 +9,13 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
 
     working_dir: /app/src
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     #command: bash -c "python3 utils.py 1 && tail -f /dev/null"
+
+#docker exec -it proyecto-strassen-pam-teoria-1 bash

@@ -50,7 +50,7 @@ $(TARGET3): $(SRCS3)
 # Limpiar archivos temporales (.o, .d) y ejecutable
 .PHONY: clean run
 
-NVCC_AVAILABLE := $(shell command -v nvcc 2>/dev/null)
+NVCC_AVAILABLE := $(shell nvcc -V 2>/dev/null)
 
 all: $(TARGET1) $(TARGET2)
 ifdef NVCC_AVAILABLE

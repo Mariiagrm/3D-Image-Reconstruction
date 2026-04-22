@@ -6,8 +6,6 @@ ENV MPLBACKEND=Agg
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
-    python3-numpy \
-    python3-matplotlib \
     g++ \
     make \
     libgl1 \
@@ -15,21 +13,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsm6 \
     libxext6 \
     libxrender1 \
-    && rm -rf /var/lib/apt/lists/*
+    libopencv-dev \
+    && apt-get purge -y 'python3-numpy*' 'python3-matplotlib*' 'python3-pil*' || true \
+    && apt-get autoremove -y \
+    && rm -rf /usr/lib/python3/dist-packages/numpy* \
+              /usr/lib/python3/dist-packages/matplotlib* \
+              /usr/lib/python3/dist-packages/mpl_toolkits* \
+              /usr/lib/python3/dist-packages/PIL* \
+              /usr/lib/python3/dist-packages/Pillow* \
+              /var/lib/apt/lists/*
 
 
 WORKDIR /app
 
 COPY src/requirements.txt /app/src/requirements.txt
-RUN apt-get update  && apt-get install -y --no-install-recommends \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install --no-cache-dir  \
+RUN pip3 install --no-cache \
     -r /app/src/requirements.txt \
-    Pillow
+    numpy matplotlib Pillow
 
-
+#pip install -r requirements.txt --break-system-packages
 COPY data/ /app/data/
 COPY src/ /app/src/
 
