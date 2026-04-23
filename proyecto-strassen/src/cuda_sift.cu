@@ -809,12 +809,6 @@ int main(int argc, char* argv[])
     cudaEventDestroy(t0);
     cudaEventDestroy(t1);
 
-    FILE *csv = fopen("../results/tiempos.csv", "a");
-    if (csv) {
-        fprintf(csv, "sift_cuda,%.6f,%d\n", t_cuda, (int)files.size());
-        fclose(csv);
-        std::cout << "Tiempo CUDA exportado a ../results/tiempos.csv" << std::endl;
-    }
 
     return 0;
 }

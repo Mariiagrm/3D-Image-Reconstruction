@@ -62,14 +62,6 @@ int main(void) {
 
     exportar_puntos_csv("../results/cloud_points/puntos_rotados.csv", rotados, N, 3);
 
-    // ── 4. Exportar tiempo de rotación a CSV (resetea el fichero) ────────────
-    FILE *csv = fopen("../results/tiempos.csv", "w");
-    if (csv) {
-        fprintf(csv, "algoritmo,tiempo_s,n\n");
-        fprintf(csv, "rotacion_paralela_nx3,%.6f,%d\n", t_rot, N);
-        fclose(csv);
-        printf("\nTiempo de rotacion exportado a ../results/tiempos.csv\n");
-    }
 
     // ── Liberar memoria ───────────────────────────────────────────────────────
     for (int i = 0; i < N; i++) { free(puntos[i]); free(rotados[i]); }

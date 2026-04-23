@@ -73,7 +73,6 @@ def reconstruccion_directorio(ruta_directorio, K):
     if len(archivos) < 2:
         raise ValueError("Se necesitan al menos 2 imágenes en el directorio.")
 
-    csv_path = Path(__file__).resolve().parent.parent / "results" / "tiempos.csv"
     csv_path.parent.mkdir(parents=True, exist_ok=True)
 
     if respuesta == 's':

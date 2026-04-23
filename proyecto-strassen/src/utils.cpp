@@ -121,14 +121,6 @@ int main(int argc, char* argv[]) {
               << max_threads << " hilos)" << std::endl;
     std::cout << "--------------------------------------------------" << std::endl;
 
-    // ── Exportar tiempos al CSV compartido (append para no borrar main.cpp) ──
-    FILE *csv = fopen("../results/tiempos.csv", "a");
-    if (csv) {
-        fprintf(csv, "preprocesamiento_limpieza_imagenes_secuencial,%.6f,%d\n", t_sec, N);
-        fprintf(csv, "preprocesamiento_limpieza_imagenes_paralelo,%.6f,%d\n",   t_par, N);
-        fclose(csv);
-        std::cout << "Tiempos de preprocesamiento de limpieza de imagenes exportados a ../results/tiempos.csv" << std::endl;
-    }
 
     return 0;
 }
