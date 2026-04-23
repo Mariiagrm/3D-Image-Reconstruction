@@ -21,10 +21,10 @@ echo " PASO 1: reconstrucción 3D"
 echo "=============================="
 python3 utils.py 1
 
-# ── 3. Rotación con Strassen (lee puntos_3d.bin, escribe puntos_rotados.csv) ──
+# ── 3. Rotación con multiplicacion de matrices (lee puntos_3d.bin, escribe puntos_rotados.csv) ──
 echo ""
 echo "=============================="
-echo " PASO 2: Strassen app (C++)"
+echo " PASO 2: Transformación de ángulos con multiplicación de matrices (C++)"
 echo "=============================="
 ./strassen_app
 
